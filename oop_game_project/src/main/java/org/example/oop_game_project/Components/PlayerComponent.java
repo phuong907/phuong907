@@ -1,6 +1,6 @@
 package org.example.oop_game_project.Components;
 
-import Bomberman.DynamicEntityState.State;
+import org.example.oop_game_project.DynamicEntityState.State;
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
