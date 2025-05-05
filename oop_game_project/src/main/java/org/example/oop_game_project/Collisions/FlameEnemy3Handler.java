@@ -3,7 +3,7 @@ package org.example.oop_game_project.Collisions;
 import org.example.oop_game_project.Components.Enemy.Enemy1;
 import org.example.oop_game_project.Components.Enemy.Enemy3;
 import org.example.oop_game_project.Components.FlameComponent;
-import org.example.oop_game_project.GameType;
+import org.example.oop_game_project.GameType.*;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.physics.CollisionHandler;
