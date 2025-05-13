@@ -10,32 +10,42 @@ import static org.example.oop_game_project.Constants.Constant.*;
 import static org.example.oop_game_project.Sounds.SoundEffect.turnOnMusic;
 import static com.almasb.fxgl.dsl.FXGL.*;
 
+// Class representing the stage start scene displayed when a new game level begins
 public class StageStartScene extends SubScene {
+    // Constructor for the stage start scene, initializing the UI and animation
     public StageStartScene() {
+        // Play the stage start sound effect
         play("stage_start.wav");
 
+        // Create a fully opaque black rectangle as the background
         var background = new Rectangle(SCENE_WIDTH, SCENE_HEIGHT, Color.color(0, 0, 0, 1));
 
+        // Create and style the stage title text, displaying the current level
         var title = getUIFactoryService().newText("Stage " + geti("level"), Color.WHITE, 40);
-        title.setStroke(Color.WHITESMOKE);
-        title.setStrokeWidth(1.5);
-        title.setEffect(new Bloom(0.6));
-        title.setX(SCENE_WIDTH / 3);
-        title.setY(SCENE_HEIGHT / 2);
+        title.setStroke(Color.WHITESMOKE); // Add a light gray outline to the text
+        title.setStrokeWidth(1.5); // Set the outline thickness
+        title.setEffect(new Bloom(0.6)); // Apply a bloom effect for a glowing appearance
+        title.setX(SCENE_WIDTH / 3); // Position the text horizontally
+        title.setY(SCENE_HEIGHT / 2); // Center the text vertically
+
+        // Add the background and title to the scene's content root
         getContentRoot().getChildren().addAll(background, title);
 
+        // Build and play a fade animation that maintains opacity for 4 seconds
         animationBuilder()
-                .onFinished(() -> popSubScene())
-                .duration(Duration.seconds(4))
-                .fade(getContentRoot())
-                .from(1)
-                .to(1)
-                .buildAndPlay(this);
+                .onFinished(() -> popSubScene()) // Call popSubScene when animation finishes
+                .duration(Duration.seconds(4)) // Set animation duration to 4 seconds
+                .fade(getContentRoot()) // Apply fade effect to the content root
+                .from(1) // Start with full opacity
+                .to(1) // Maintain full opacity
+                .buildAndPlay(this); // Build and play the animation
     }
 
+    // Method to pop the current subscene and resume background music
     public void popSubScene() {
+        // Turn on the background music
         turnOnMusic();
+        // Remove the current subscene from the scene stack
         getSceneService().popSubScene();
     }
-
 }
