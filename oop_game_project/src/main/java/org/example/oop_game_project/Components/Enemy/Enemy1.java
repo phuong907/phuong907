@@ -2,7 +2,7 @@ package org.example.oop_game_project.Components.Enemy;
 
 import org.example.oop_game_project.Components.FlameComponent;
 import javafx.util.Duration;
-
+ 
 import static org.example.oop_game_project.Constants.Constant.ENEMY_SPEED;
 import static org.example.oop_game_project.GameType.*;
 import static com.almasb.fxgl.dsl.FXGL.*;
