@@ -90,7 +90,7 @@ public class MainMenu extends FXGLMenu {
         getDialogService().showBox("How to Play", pane, getUIFactoryService().newButton("OK"));
     }
 
-    // Method to start a new game
+    // Method to start a new game.
     public void newGame() {
         // Trigger the new game event
         fireNewGame();
