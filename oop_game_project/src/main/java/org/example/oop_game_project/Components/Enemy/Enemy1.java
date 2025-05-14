@@ -7,7 +7,7 @@ import static org.example.oop_game_project.Constants.Constant.ENEMY_SPEED;
 import static org.example.oop_game_project.GameType.*;
 import static com.almasb.fxgl.dsl.FXGL.*;
 
-public class Enemy1 extends Enemy {
+public class Enemy1 extends org.example.oop_game_project.Components.Enemy.Enemy {
     public Enemy1() {
         super(-ENEMY_SPEED, 0, 1, 3, "enemy1.png");
 

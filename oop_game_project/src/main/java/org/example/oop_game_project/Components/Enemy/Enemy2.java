@@ -5,13 +5,13 @@ import org.example.oop_game_project.Components.PlayerComponent;
 import com.almasb.fxgl.entity.Entity;
 import javafx.util.Duration;
 
-import static Bomberman.Constants.Constant.ENEMY_SPEED;
-import static Bomberman.Constants.Constant.TILED_SIZE;
-import static Bomberman.DynamicEntityState.State.DIE;
-import static Bomberman.GameType.*;
+import static org.example.oop_game_project.Constants.Constant.ENEMY_SPEED;
+import static org.example.oop_game_project.Constants.Constant.TILED_SIZE;
+import static org.example.oop_game_project.DynamicEntityState.State.DIE;
+import static org.example.oop_game_project.GameType.*;
 import static com.almasb.fxgl.dsl.FXGL.*;
 
-public class Enemy2 extends Enemy {
+public class Enemy2 extends org.example.oop_game_project.Components.Enemy.Enemy {
     private boolean isCatching;
 
     public Enemy2() {
