@@ -1,4 +1,3 @@
-// AppLauncher.java
 package org.example.oop_game_project;
 
 import javafx.application.Application;
