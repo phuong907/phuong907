@@ -2,7 +2,7 @@
 
 
 
-<img src="ground.jpg" alt="drawing" width="400"/>
+<img src="ground.jpg" alt="drawing" width="800"/>
 
 ## Hướng Dẫn Chơi
 - Di chuyển: Sử dụng các phím *W* (lên), *S* (xuống), *A* ( Ascendant phím *D* (trái), WASD để điều khiển Bomber di chuyển theo 4 hướng: trái, phải, lên, xuống.
