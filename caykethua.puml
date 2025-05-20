@@ -1,0 +1,809 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+
+skinparam classAttributeIconSize 0
+package Bomberman.Collisions {
+    class FlameEnemy3Handler {
+        +FlameEnemy3Handler()
+        #onCollision(flame: Entity, enemy: Entity)
+        -onTransform(parent: Entity)
+    }
+
+    FlameEnemy3Handler --|> CollisionHandler
+}
+
+package Bomberman.Components.Enemy {
+    class Enemy3 {
+        +getState(): State
+        +getDx(): double
+        +getDy(): double
+        +setStateDie(): void
+    }
+
+    class Enemy1 {
+        +setState(state: State): void
+        +setDxDy(dx: double, dy: double): void
+    }
+}
+
+package Bomberman.Components {
+    class FlameComponent {
+        +isActivation(): boolean
+    }
+}
+
+FlameEnemy3Handler --> Enemy3 : uses
+FlameEnemy3Handler --> Enemy1 : spawns
+FlameEnemy3Handler --> FlameComponent : checks
+FlameEnemy3Handler ..> State : uses
+FlameEnemy3Handler ..> Constant : uses
+FlameEnemy3Handler ..> GameType : uses
+FlameEnemy3Handler ..> FXGL : calls FXGL functions
+
+package Bomberman.Components {
+    class BombComponent {
+        + BombComponent()
+        + onAdded()
+        + explode(int flames)
+    }
+    class BrickBreakComponent {
+            - AnimatedTexture texture
+            - AnimationChannel animation
+            + BrickBreakComponent()
+            + onAdded()
+        }
+    class FlameComponent {
+            - boolean activation
+            - AnimatedTexture texture
+            - AnimationChannel animationFlame
+            + FlameComponent(String assetName)
+            + onAdded()
+            + isActivation(): boolean
+        }
+}
+' Các thư viện được sử dụng
+' import com.almasb.fxgl.app.scene.FXGLMenu; // thư viện FXGL
+' import com.almasb.fxgl.app.scene.MenuType; // thư viện FXGL
+' import javafx.scene.* và javafx.geometry.* // JavaFX
+' import Bomberman.Constants.Constant; // hằng số tự định nghĩa
+' import Bomberman.Sounds.SoundEffect; // hiệu ứng âm thanh
+
+package Bomberman.Menu {
+
+    class GameMenu {
+        +GameMenu()
+    }
+
+    GameMenu --|> FXGLMenu
+    ' Thư viện ngoài:
+    ' FXGL:
+    ' - com.almasb.fxgl.app.scene.FXGLMenu
+    ' - com.almasb.fxgl.app.scene.MenuType
+    ' - com.almasb.fxgl.input.view.KeyView
+    ' - static com.almasb.fxgl.dsl.FXGL.*
+    ' JavaFX:
+    ' - javafx.scene.image.Image
+    ' - javafx.scene.image.ImageView
+    ' - javafx.scene.effect.DropShadow
+    ' - javafx.scene.layout.*
+    ' - javafx.geometry.Pos
+    ' - javafx.scene.paint.Color
+    ' - javafx.util.Duration
+
+    class MainMenu {
+        +MainMenu()
+        -instruct() : void
+        +newGame() : void
+    }
+
+    MainMenu --|> FXGLMenu : extends
+
+    class FXGLMenu <<abstract>>
+    class MenuType
+    class VBox
+    class ImageView
+    class Image
+    class DropShadow
+    class Color
+    class GridPane
+    class HBox
+    class KeyView
+    class Duration
+
+    note right of FXGLMenu
+    From FXGL Library
+    end note
+
+    note right of ImageView
+    From JavaFX
+    end note
+
+    note "Static imports\nfrom FXGL:\ngetUIFactoryService()\ngetAppWidth()\ngetAppHeight()\nfireExit()\nfireNewGame()\ngetGameTimer()\ngetSceneService()\ngetDialogService()" as FXGLStatic
+    FXGLStatic .. MainMenu
+
+    note "Static methods:\nsetSoundSwitch()\nturnOffMusic()" as SoundEffectStatic
+    SoundEffectStatic .. MainMenu
+
+    MainMenu o--> VBox : menuBox
+    MainMenu o--> ImageView : background
+    MainMenu o--> DropShadow : dropShadow
+    MainMenu o--> GridPane : pane
+    MainMenu o--> KeyView : used in instruct()
+    ' Thư viện ngoài:
+    ' FXGL:
+    ' - com.almasb.fxgl.dsl.FXGL.getUIFactoryService()
+    ' JavaFX:
+    ' - javafx.scene.Parent
+    ' - javafx.scene.paint.Color
+    ' - javafx.beans.binding.Bindings
+
+    class MenuButton {
+        +MenuButton(name: String, fontSize: double, action: Runnable)
+    }
+
+    MenuButton --|> Parent : extends
+
+    class Parent <<abstract>>
+    class Color
+    class Bindings
+
+    note right of Parent
+    From JavaFX
+    end note
+
+    note "Static import from FXGL:\nFXGL.getUIFactoryService()" as UIFactoryNote
+    UIFactoryNote .. MenuButton
+
+    note "Used JavaFX bindings:\nhoverProperty()\nBindings.when(...)" as BindingNote
+    BindingNote .. MenuButton
+}
+
+' Các lớp ngoài (thư viện hoặc hệ thống) được sử dụng, để dưới dạng comment
+' class FXGLMenu
+' class MenuType
+' class VBox
+' class ImageView
+' class Rectangle
+' class Shape
+' class DropShadow
+' class Lighting
+' class Color
+
+' Thư viện ngoài:
+' FXGL:
+' - com.almasb.fxgl.dsl.FXGL.getSettings()
+' - com.almasb.fxgl.dsl.FXGL.showMessage()
+' Constant:
+' - Bomberman.Constants.Constant.MAX_VOLUME
+
+class SoundEffect {
+    {static} +isSoundEnabled : boolean
+    {static} +isMusicEnabled : boolean
+    --
+    {static} +turnOffMusic() : void
+    {static} +turnOnMusic() : void
+    {static} +mute() : void
+    {static} +unmute() : void
+    {static} +setSoundSwitch() : void
+}
+
+note "Static import from:\nFXGL.getSettings()\nFXGL.showMessage()" as FXGLNote
+FXGLNote .. SoundEffect
+
+note "Static import:\nConstant.MAX_VOLUME" as ConstNote
+ConstNote .. SoundEffect
+
+ ' Các lớp và interface chính
+ class EndingScene {
+     +EndingScene(String title)
+     +popSubScene()
+ }
+
+ ' Kế thừa từ SubScene (FXGL)
+ class SubScene
+
+ EndingScene --|> SubScene : extends
+
+ ' Các thành phần liên quan đến thư viện JavaFX
+ class Rectangle
+ class Color
+ class Point2D
+ class Bloom
+
+ ' Thư viện FXGL DSL
+ class FXGL {
+     +play(String)
+     +animationBuilder()
+     +getUIFactoryService()
+     +getSceneService()
+     +getGameController()
+ }
+
+ class UIFactoryService {
+     +newText(String, Color, int)
+ }
+
+ class AnimationBuilder {
+     +onFinished(Runnable)
+     +duration(Duration)
+     +scale(Node)
+     +from(Point2D)
+     +to(Point2D)
+     +buildAndPlay(SubScene)
+ }
+
+ class SceneService {
+     +popSubScene()
+ }
+
+ class GameController {
+     +gotoMainMenu()
+ }
+
+ class Duration
+
+ ' Âm thanh
+ class SoundEffect {
+     +turnOnMusic()
+ }
+
+ ' Các quan hệ sử dụng
+ EndingScene --> FXGL : static import
+ EndingScene --> Rectangle
+ EndingScene --> Color
+ EndingScene --> Point2D
+ EndingScene --> Bloom
+ EndingScene --> Duration
+ EndingScene --> SoundEffect : turnOnMusic()
+
+ ' FXGL các thành phần dịch vụ
+ FXGL --> UIFactoryService : getUIFactoryService()
+ FXGL --> SceneService : getSceneService()
+ FXGL --> GameController : getGameController()
+ FXGL --> AnimationBuilder : animationBuilder()
+
+ class StageStartScene {
+     +StageStartScene()
+     +popSubScene()
+ }
+
+ ' === KẾ THỪA TỪ FXGL SubScene ===
+ class SubScene
+
+ StageStartScene --|> SubScene : extends
+
+ ' === THƯ VIỆN JAVA FX ===
+ class Rectangle
+ class Color
+ class Bloom
+ class Duration
+
+ ' === THƯ VIỆN FXGL ===
+ class FXGL {
+     +play(String)
+     +animationBuilder()
+     +getUIFactoryService()
+     +getSceneService()
+     +geti(String)
+ }
+
+ class UIFactoryService {
+     +newText(String, Color, int)
+ }
+
+ class AnimationBuilder {
+     +onFinished(Runnable)
+     +duration(Duration)
+     +fade(Node)
+     +from(double)
+     +to(double)
+     +buildAndPlay(SubScene)
+ }
+
+ class SceneService {
+     +popSubScene()
+ }
+
+ ' === ÂM THANH ===
+ class SoundEffect {
+     +turnOnMusic()
+ }
+
+ ' === CÁC QUAN HỆ SỬ DỤNG ===
+ StageStartScene --> FXGL : static import
+ StageStartScene --> Rectangle
+ StageStartScene --> Color
+ StageStartScene --> Bloom
+ StageStartScene --> Duration
+ StageStartScene --> SoundEffect : turnOnMusic()
+
+ ' FXGL gọi đến các dịch vụ
+ FXGL --> UIFactoryService : getUIFactoryService()
+ FXGL --> SceneService : getSceneService()
+ FXGL --> AnimationBuilder : animationBuilder()
+ class UIComponents {
+     +addILabelUI(String varName, String title, double x, double y)
+     +addDLabelUI(String varName, String title, double x, double y)
+ }
+
+ ' === THƯ VIỆN JAVA FX ===
+ class Label
+ class Font
+ class Color
+
+ ' === FXGL ===
+ class FXGL {
+     +getip(String): IntegerProperty
+     +getdp(String): DoubleProperty
+     +addUINode(Node, double, double)
+ }
+
+ ' === JavaFX Property Binding ===
+ interface ObservableValue
+ class IntegerProperty
+ class DoubleProperty
+
+ IntegerProperty ..|> ObservableValue
+ DoubleProperty ..|> ObservableValue
+
+ ' === QUAN HỆ SỬ DỤNG ===
+ UIComponents --> Label
+ UIComponents --> Color
+ UIComponents --> Font
+ UIComponents --> IntegerProperty : getip()
+ UIComponents --> DoubleProperty : getdp()
+ UIComponents --> FXGL : static import
+ UIComponents --> FXGL : addUINode()
+
+ class GameApp {
+     -Map temp
+     -boolean isLoading
+     +main(String[])
+     +onPlayerDied()
+     -setLevel()
+     -nextLevel()
+     ..FXGL lifecycle methods..
+     +initSettings(GameSettings)
+     +initGame()
+     +initInput()
+     +initPhysics()
+     +initUI()
+     +onUpdate(double)
+     +onPreInit()
+     +initGameVars(Map)
+ }
+
+ ' ====================== FXGL Core ========================
+ class GameApplication
+ GameApp --|> GameApplication
+
+ class GameSettings
+ class FXGLMenu
+ interface SceneFactory
+ class Viewport
+ class PhysicsWorld
+
+ ' ====================== Enemy Components ========================
+ package Bomberman.Components.Enemy {
+     class Enemy1
+     class Enemy2
+     class Enemy3
+     class Enemy4
+     class Enemy5
+ }
+
+ ' ====================== Other Components ========================
+ class FlameComponent
+ class PlayerComponent
+
+ GameApp --> PlayerComponent
+ GameApp --> FlameComponent
+ GameApp --> Enemy1
+ GameApp --> Enemy2
+ GameApp --> Enemy3
+ GameApp --> Enemy4
+ GameApp --> Enemy5
+
+ ' ====================== Menu ========================
+ class MainMenu
+ class GameMenu
+
+ MainMenu --|> FXGLMenu
+ GameMenu --|> FXGLMenu
+ SceneFactory <|.. MainMenu
+ SceneFactory <|.. GameMenu
+
+ ' ====================== UI ========================
+ class UIComponents
+ class StageStartScene
+ class EndingScene
+
+ GameApp --> UIComponents
+ GameApp --> EndingScene
+ GameApp --> StageStartScene
+
+ ' ====================== FXGL DSL / Engine ========================
+ class FXGL {
+     +getInput()
+     +getGameWorld()
+     +getPhysicsWorld()
+     +getSceneService()
+     +getGameTimer()
+     +getGameScene()
+     +geti(String)
+     +getd(String)
+     +inc(String, double)
+     +set(String, Object)
+     +spawn(String)
+     +play(String)
+     +loopBGM(String)
+     +turnOnMusic()
+     +turnOffMusic()
+     +showMessage(String)
+ }
+
+ GameApp --> FXGL : static import
+ package "Bomberman Game" {
+
+     class GameFactory {
+         +newPlayer(data: SpawnData): Entity
+         +newEnemy1(data: SpawnData): Entity
+         +newEnemy2(data: SpawnData): Entity
+         +newEnemy3(data: SpawnData): Entity
+         +newEnemy4(data: SpawnData): Entity
+         +newEnemy5(data: SpawnData): Entity
+         +newBomb(data: SpawnData): Entity
+         +newVirtualBomb(data: SpawnData): Entity
+         +newCFlame(data: SpawnData): Entity
+         +newUFlame(data: SpawnData): Entity
+         +newDFlame(data: SpawnData): Entity
+         +newLFlame(data: SpawnData): Entity
+         +newRFlame(data: SpawnData): Entity
+         +newTUFlame(data: SpawnData): Entity
+         +newTDFlame(data: SpawnData): Entity
+         +newTLFlame(data: SpawnData): Entity
+         +newTRFlame(data: SpawnData): Entity
+         +newBrick(data: SpawnData): Entity
+         +newWall(data: SpawnData): Entity
+         +newBackground(data: SpawnData): Entity
+         +newDoor(data: SpawnData): Entity
+         +newItem(data: SpawnData): Entity
+         +newItem2(data: SpawnData): Entity
+         +newItem3(data: SpawnData): Entity
+         +newItem4(data: SpawnData): Entity
+         +newItem5(data: SpawnData): Entity
+     }
+
+     class Entity
+     class SpawnData
+     class PhysicsComponent
+     class CollidableComponent
+     class PlayerComponent
+     class BombComponent
+     class FlameComponent
+     class Enemy1
+     class Enemy2
+     class Enemy3
+     class Enemy4
+     class Enemy5
+
+     GameFactory --> Entity
+     GameFactory --> SpawnData
+     Entity --> PhysicsComponent
+     Entity --> CollidableComponent
+     Entity --> PlayerComponent : for Player
+     Entity --> BombComponent : for Bomb
+     Entity --> FlameComponent : for Flame
+     Entity --> Enemy1 : for Enemy1
+     Entity --> Enemy2 : for Enemy2
+     Entity --> Enemy3 : for Enemy3
+     Entity --> Enemy4 : for Enemy4
+     Entity --> Enemy5 : for Enemy5
+                         }
+     ' Gói và lớp cha
+     package Bomberman.Components.Enemy {
+         abstract class Enemy {
+             - int FRAME_SIZE = 48
+             - double dx
+             - double dy
+             - double speedFactor
+             - double reactionForce
+             - State state
+             - AnimatedTexture texture
+             - AnimationChannel animDie
+             - AnimationChannel animWalkDown
+             - AnimationChannel animWalkRight
+             - AnimationChannel animWalkUp
+             - AnimationChannel animWalkLeft
+
+             + Enemy(double dx, double dy, double speedFactor, double reactionForce, String assetName)
+             + void onAdded()
+             + void onUpdate(double tpf)
+             + void turn()
+             + void turnLeft()
+             + void turnRight()
+             + void turnUp()
+             + void turnDown()
+             + void setStateDie()
+             + void setDxDy(double dx, double dy)
+             + double getDx()
+             + double getDy()
+             + State getState()
+             + void setState(State state)
+         }
+     }
+
+     ' Các lớp liên quan bên ngoài
+     package com.almasb.fxgl.entity.component {
+         class Component
+     }
+
+     package com.almasb.fxgl.texture {
+         class AnimatedTexture
+         class AnimationChannel
+     }
+
+     package Bomberman.DynamicEntityState {
+         enum State {
+             UP
+             DOWN
+             LEFT
+             RIGHT
+             DIE
+         }
+     }
+
+     Enemy --|> Component
+     Enemy --> AnimatedTexture
+     Enemy --> AnimationChannel
+     Enemy --> State
+     package Bomberman.Components.Enemy {
+         class Enemy1 {
+             + Enemy1()
+         }
+
+         Enemy1 --|> Enemy
+     }
+     package Bomberman.Components.Enemy {
+         class Enemy2 {
+             - boolean isCatching
+             + Enemy2()
+             + onUpdate(double tpf)
+             + turn()
+         }
+
+         class Enemy {
+             - double dx
+             - double dy
+             - double speedFactor
+             - double reactionForce
+             - State state
+             - AnimatedTexture texture
+             - AnimationChannel animDie
+             - AnimationChannel animWalkDown
+             - AnimationChannel animWalkRight
+             - AnimationChannel animWalkUp
+             - AnimationChannel animWalkLeft
+             + Enemy(double dx, double dy, double speedFactor, double reactionForce, String assetName)
+             + onAdded()
+             + onUpdate(double tpf)
+             + turn()
+             + turnLeft()
+             + turnRight()
+             + turnUp()
+             + turnDown()
+             + setStateDie()
+             + setDxDy(double dx, double dy)
+             + getDx()
+             + getDy()
+             + getState()
+             + setState(State state)
+         }
+
+         Enemy2 --|> Enemy
+     }
+     package Bomberman.Components.Enemy {
+         class Enemy3 {
+             + Enemy3()
+         }
+
+         class Enemy {
+             - double dx
+             - double dy
+             - double speedFactor
+             - double reactionForce
+             - State state
+             - AnimatedTexture texture
+             - AnimationChannel animDie
+             - AnimationChannel animWalkDown
+             - AnimationChannel animWalkRight
+             - AnimationChannel animWalkUp
+             - AnimationChannel animWalkLeft
+             + Enemy(double dx, double dy, double speedFactor, double reactionForce, String assetName)
+             + onAdded()
+             + onUpdate(double tpf)
+             + turn()
+             + turnLeft()
+             + turnRight()
+             + turnUp()
+             + turnDown()
+             + setStateDie()
+             + setDxDy(double dx, double dy)
+             + getDx()
+             + getDy()
+             + getState()
+             + setState(State state)
+         }
+
+         Enemy3 --|> Enemy
+     }
+
+     package Bomberman.Collisions {
+         class FlameEnemy3Handler
+     }
+
+     Enemy3 ..> FlameEnemy3Handler : uses
+     package Bomberman.Components.Enemy {
+         class Enemy4 {
+             + Enemy4()
+             + turn()
+         }
+
+         class Enemy {
+             - double dx
+             - double dy
+             - double speedFactor
+             - double reactionForce
+             - State state
+             - AnimatedTexture texture
+             - AnimationChannel animDie
+             - AnimationChannel animWalkDown
+             - AnimationChannel animWalkRight
+             - AnimationChannel animWalkUp
+             - AnimationChannel animWalkLeft
+             + Enemy(double dx, double dy, double speedFactor, double reactionForce, String assetName)
+             + onAdded()
+             + onUpdate(double tpf)
+             + turn()
+             + turnLeft()
+             + turnRight()
+             + turnUp()
+             + turnDown()
+             + setStateDie()
+             + setDxDy(double dx, double dy)
+             + getDx()
+             + getDy()
+             + getState()
+             + setState(State state)
+         }
+
+         Enemy4 --|> Enemy
+     }
+     package Bomberman.Components.Enemy {
+
+         abstract class Enemy {
+             - double dx
+             - double dy
+             - double speedFactor
+             - double reactionForce
+             - State state
+             - AnimatedTexture texture
+             - AnimationChannel animDie
+             - AnimationChannel animWalkDown
+             - AnimationChannel animWalkRight
+             - AnimationChannel animWalkUp
+             - AnimationChannel animWalkLeft
+             + Enemy(double dx, double dy, double speedFactor, double reactionForce, String assetName)
+             + onAdded()
+             + onUpdate(double tpf)
+             + turn()
+             + turnLeft()
+             + turnRight()
+             + turnUp()
+             + turnDown()
+             + setStateDie()
+             + setDxDy(double dx, double dy)
+             + getDx()
+             + getDy()
+             + getState()
+             + setState(State state)
+         }
+
+         class Enemy1 {
+             + Enemy1()
+         }
+
+         class Enemy2 {
+             - boolean isCatching
+             + Enemy2()
+             + onUpdate(double tpf)
+             + turn()
+         }
+
+         class Enemy3 {
+             + Enemy3()
+         }
+
+         class Enemy4 {
+             + Enemy4()
+             + turn()
+         }
+
+         class Enemy5 {
+             - boolean isCatching
+             + Enemy5()
+             + onUpdate(double tpf)
+             + turn()
+         }
+
+         Enemy1 --|> Enemy
+         Enemy2 --|> Enemy
+         Enemy3 --|> Enemy
+         Enemy4 --|> Enemy
+         Enemy5 --|> Enemy
+     }
+     package "Bomberman.Authentication" {
+         class AuthService {
+             +URL : String
+             +USER : String
+             +PASS : String
+
+             -exists(username : String) : boolean
+             +register(username : String, password : String) : boolean
+             +login(username : String, password : String) : boolean
+             {static}
+         }
+
+         note top of AuthService
+             Static utility class to interact with
+             MySQL database for login/register logic.
+         end note
+         class LoginController {
+                 -usernameField : TextField
+                 -passwordField : PasswordField
+                 -messageLabel : Label
+
+                 +onLogin() : void
+                 +onShowRegister() : void
+                 -loadScene(fxml : String, title : String) : void
+                 {static}
+             }
+
+             note top of LoginController
+                 JavaFX Controller cho login form.\n
+                 Gọi AuthService để kiểm tra tài khoản.
+             end note
+
+             LoginController --> AuthService : uses
+         class RegisterController {
+                 -usernameField : TextField
+                 -passwordField : PasswordField
+                 -confirmField : PasswordField
+                 -messageLabel : Label
+
+                 +onRegister() : void
+                 +onBackToLogin() : void
+                 -loadScene(fxml : String, title : String) : void
+             }
+
+             note top of RegisterController
+                 JavaFX Controller cho form đăng ký.\n
+                 Kiểm tra nhập liệu và gọi AuthService.register().
+             end note
+
+             RegisterController --> AuthService : uses
+          class TestDB {
+                 +main(args : String[]) : void
+                 {static}
+             }
+
+             TestDB --> AuthService : uses
+         }
+
+         note top of TestDB
+             Lớp tiện ích để kiểm tra kết nối cơ sở dữ liệu.\n
+             In ra thông tin URL, USER và thử kết nối MySQL.
+         end note
+     }
+@enduml
